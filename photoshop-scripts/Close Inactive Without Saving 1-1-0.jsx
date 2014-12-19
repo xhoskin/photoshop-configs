@@ -1,0 +1,74 @@
+﻿// Close Inactive Without Saving - Adobe Photoshop Script
+// Description: closes ALL documents, except the active document, without saving (and without prompting to save changes)
+// Requirements: Adobe Photoshop CS, or higher
+// Version: 1.1.0, 5/July/2009
+// Author: Trevor Morris (trevor@morris-photographics.com)
+// Website: http://morris-photographics.com/
+// ============================================================================
+// Installation:
+// 1. Place script in 'C:\Program Files\Adobe\Adobe Photoshop CS#\Presets\Scripts\'
+// 2. Restart Photoshop
+// 3. Choose File > Scripts > Close Inactive Without Saving
+// ============================================================================
+
+// enable double-clicking from Mac Finder or Windows Explorer
+// this command only works in Photoshop CS2 and higher
+#target photoshop
+
+// bring application forward for double-click events
+app.bringToFront();
+
+///////////////////////////////////////////////////////////////////////////////
+// main - close ALL documents, except the active document, without saving changes
+///////////////////////////////////////////////////////////////////////////////
+function main() {
+	// declare local variables
+	var name = activeDocument.name;
+
+	// close documents
+	while (documents.length > 1) {
+		for (var i = 0; i < documents.length; i++) {
+			// close all documents except the active document
+			if (name != documents[i].name) {
+				documents[i].close(SaveOptions.DONOTSAVECHANGES);
+			}
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// isOpenDocs - ensure at least one document is open
+///////////////////////////////////////////////////////////////////////////////
+function isOpenDocs() {
+	if (documents.length) {
+		return true;
+	}
+	else {
+		alert('There are no documents open.', 'No Documents Open', false);
+		return false;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// showError - display error message if something goes wrong
+///////////////////////////////////////////////////////////////////////////////
+function showError(err) {
+	if (confirm('An unknown error has occurred.\n' +
+		'Would you like to see more information?', true, 'Unknown Error')) {
+			alert(err + ': on line ' + err.line, 'Script Error', true);
+	}
+}
+
+
+// test initial conditions prior to running main function
+if (isOpenDocs()) {
+	try {
+		main();
+	}
+	catch(e) {
+		// don't report error on user cancel
+		if (e.number != 8007) {
+			showError(e);
+		}
+	}
+}
